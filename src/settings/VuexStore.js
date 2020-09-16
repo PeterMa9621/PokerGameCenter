@@ -5,7 +5,7 @@ import User from "../models/User";
 Vue.use(Vuex);
 const store = new Vuex.Store({
     state: {
-        user: new User({username: 'Peter', isAdmin: true, isAuthorized: true})
+        user: new User({})
     },
     mutations: {
         setUser(state, newUser) {
@@ -14,7 +14,8 @@ const store = new Vuex.Store({
     },
     actions: {
         setUser({commit}, newUser) {
-            commit.setUser(newUser);
+            commit('setUser', newUser);
+            window.$cookies.set('username', newUser.username);
         }
     }
 });

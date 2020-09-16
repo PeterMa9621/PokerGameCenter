@@ -1,11 +1,10 @@
 export default class User {
-    constructor({username, email, token, isAdmin: isAdmin, createdAt, updatedAt, isAuthorized}) {
+    constructor({username, token, createdAt, isAuthorized, score, winRate}) {
         this.username = username === undefined ? '' : username;
-        this.email = email === undefined ? '' : email;
         this.token = token === undefined ? '' : token;
-        this.isAdmin = isAdmin === undefined ? false : isAdmin;
         this.createdAt = createdAt === undefined ? '' : createdAt;
-        this.updatedAt = updatedAt === undefined ? '' : updatedAt;
         this.isAuthorized = isAuthorized === undefined ? false : isAuthorized;
+        this.score = score === undefined ? 0 : score;
+        this.winRate = winRate === undefined ? 0 : winRate;
     }
 }

@@ -13,11 +13,11 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="username"><strong>UserName</strong></label>
-                                <input id="username" name="username" class="form-control">
+                                <input id="username" name="username" class="form-control" v-model="username">
                             </div>
                             <div class="form-group">
                                 <label for="password"><strong>Password</strong></label>
-                                <input id="password" name="username" class="form-control">
+                                <input id="password" name="username" class="form-control" v-model="password">
                             </div>
                             <div class="d-flex justify-content-between">
                                 <button class="btn btn-primary" @click="login()">Log in</button>
@@ -36,20 +36,20 @@
 </template>
 
 <script>
+    import User from "../models/User";
+
     export default {
         name: "LoginPage",
         data() {
             return {
-                query: [],
-                msg: 'This is a test'
+                username: '',
+                password: ''
             }
-        },
-        mounted() {
-            this.query = this.$route.query;
         },
         methods: {
             login() {
-                console.log('login');
+                this.$store.dispatch('setUser', new User({username: this.username, isAuthorized: true}));
+                this.$router.push(this.$route.query.next ? this.$route.query.next : '/');
             }
         }
     }

@@ -1,20 +1,16 @@
 <template>
   <div id="app">
-    <div class="h-100 d-flex flex-column">
-      <navigation/>
-      <div class="flex-column flex-grow-1 overflow-auto">
-        <router-view/>
-      </div>
-    </div>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <router-view/>
   </div>
 </template>
 
 <script>
-import Navigation from "./components/navigation/Navigation";
 export default {
   name: 'App',
   components: {
-    Navigation
+
   }
 }
 </script>
@@ -23,6 +19,8 @@ export default {
   html, body {
     height: 100%;
     min-width: 40vh;
+    overflow:hidden;
+    width:100%;
   }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

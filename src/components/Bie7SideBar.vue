@@ -14,10 +14,10 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="player in players" :key="player.userName">
-                        <td>{{ player['userName'] }}</td>
-                        <td>{{ player['score'] }}</td>
-                        <td>{{ player['winRate'] }}</td>
+                    <tr v-for="(player, index) in players" :key="index + '_player'">
+                        <td v-if="player!==null">{{ player['userName'] }}</td>
+                        <td v-if="player!==null">{{ player['score'] }}</td>
+                        <td v-if="player!==null">{{ player['winRate'] }}</td>
                     </tr>
                     </tbody>
                 </table>

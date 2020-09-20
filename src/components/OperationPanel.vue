@@ -1,19 +1,19 @@
 <template>
     <div>
-        <div v-if="type==='play'">
-            <v-line :config="playButtonCardConfig" @mousemove="onMouseInPlayButton" @mouseout="onMouseOutPlayButton" @click="onPlayCard" />
-            <v-text :config="playButtonTextConfig" @mousemove="onMouseInPlayButton" @mouseout="onMouseOutPlayButton" @click="onPlayCard" />
+        <div>
+            <v-line :config="type==='play' && my.myTurn?playButtonCardConfig:{}" @mousemove="onMouseInPlayButton" @mouseout="onMouseOutPlayButton" @click="onPlayCard" />
+            <v-text :config="type==='play' && my.myTurn?playButtonTextConfig:{}" @mousemove="onMouseInPlayButton" @mouseout="onMouseOutPlayButton" @click="onPlayCard" />
         </div>
-        <div v-if="type==='kou'">
-            <v-line :config="kouButtonCardConfig" @mousemove="onMouseInKouButton" @mouseout="onMouseOutKouButton" @click="onKouCard" />
-            <v-text :config="kouButtonTextConfig" @mousemove="onMouseInKouButton" @mouseout="onMouseOutKouButton" @click="onKouCard" />
+        <div>
+            <v-line :config="type==='kou'?kouButtonCardConfig:{}" @mousemove="onMouseInKouButton" @mouseout="onMouseOutKouButton" @click="onKouCard" />
+            <v-text :config="type==='kou'?kouButtonTextConfig:{}" @mousemove="onMouseInKouButton" @mouseout="onMouseOutKouButton" @click="onKouCard" />
         </div>
-        <div v-if="type==='prepare'">
-            <v-line :config="prepareButtonCardConfig" @mousemove="onMouseInPrepareButton" @mouseout="onMouseOutPrepareButton" @click="onPrepareCard" />
-            <v-text :config="prepareButtonTextConfig" @mousemove="onMouseInPrepareButton" @mouseout="onMouseOutPrepareButton" @click="onPrepareCard" />
+        <div>
+            <v-line :config="type==='prepare'?prepareButtonCardConfig:{}" @mousemove="onMouseInPrepareButton" @mouseout="onMouseOutPrepareButton" @click="onPrepareCard" />
+            <v-text :config="type==='prepare'?prepareButtonTextConfig:{}" @mousemove="onMouseInPrepareButton" @mouseout="onMouseOutPrepareButton" @click="onPrepareCard" />
         </div>
-        <CountDownClock v-if="me.myTurn" :x="countDownPos.x" :y="countDownPos.y" :height="0"
-                        :user-name="me.userName" @countDownCallback="(userName) => countDownCallback(userName)" />
+        <CountDownClock v-if="my.myTurn" :x="countDownPos.x" :y="countDownPos.y" :height="0"
+                        :user-name="my.userName" @countDownCallback="(userName) => countDownCallback(userName)" />
     </div>
 </template>
 
@@ -26,6 +26,8 @@
         props: ['x', 'cardHeight', 'selectedPoker', 'pokers', 'type', 'coveredPokers', 'service', 'me'],
         data() {
             return {
+                buttonCardConfig: {},
+                buttonTextConfig: {},
                 playButtonCardConfig: {
                     x: this.x,
                     y: 0,
@@ -75,7 +77,8 @@
                 countDownPos: {
                     x: this.x,
                     y: 0
-                }
+                },
+                my: this.me
             }
         },
         watch: {
@@ -84,12 +87,22 @@
                 this.kouButtonCardConfig.x = newX;
                 this.prepareButtonCardConfig.x = newX;
                 this.calculateButtonsPosition();
+            },
+            me: function (newMe) {
+                this.my = newMe;
+                this.hasPrepared = newMe.isPrepared;
+                this.prepareButtonTextConfig.text = newMe.isPrepared?'取消准备':'准备';
+                this.prepareButtonTextConfig.x = this.prepareButtonCardConfig.x + 40 -
+                    (this.prepareButtonTextConfig.text.length * this.prepareButtonTextConfig.fontSize)/2
             }
         },
         mounted() {
             this.calculateButtonsPosition();
         },
         methods: {
+            onMouseInButton(){},
+            onMouseOutButton(){},
+            onClickButton(){},
             calculateButtonsPosition() {
                 this.playButtonCardConfig.y = window.innerHeight - this.cardHeight - 85;
                 this.playButtonTextConfig.x = this.playButtonCardConfig.x + 40 - (this.playButtonTextConfig.text.length * this.playButtonTextConfig.fontSize)/2;
@@ -104,8 +117,8 @@
                     (this.prepareButtonTextConfig.text.length * this.prepareButtonTextConfig.fontSize)/2;
                 this.prepareButtonTextConfig.y = this.prepareButtonCardConfig.y + 10;
 
-                this.countDownPos.x = this.prepareButtonTextConfig.x + 90;
-                this.countDownPos.y = this.prepareButtonTextConfig.y;
+                this.countDownPos.x = this.playButtonTextConfig.x + 90;
+                this.countDownPos.y = this.playButtonTextConfig.y;
             },
             onMouseInPlayButton() {
                 this.playButtonCardConfig.fill = 'brown';
@@ -160,11 +173,15 @@
                     return;
                 }
 
+                this.service.playPoker(selectedPoker, true);
+                /*
                 let removeIndex = this.me.myPokers.indexOf(selectedPoker);
                 console.log(removeIndex);
                 this.me.myPokers.splice(removeIndex, 1);
                 this.coveredPokers.push(selectedPoker);
                 delete this.selectedPoker.poker;
+
+                 */
             },
             onPrepareCard() {
                 if(this.hasPrepared) {
@@ -180,6 +197,39 @@
             },
             countDownCallback(userName) {
                 this.$emit('countDownCallback', userName);
+            },
+            calculateButtonType() {
+                switch (this.type) {
+                    case 'play':
+                        if(this.me.myTurn) {
+                            this.buttonCardConfig = this.playButtonCardConfig;
+                            this.buttonTextConfig = this.playButtonTextConfig;
+                            this.onMouseInButton = this.onMouseInPlayButton;
+                            this.onMouseOutButton = this.onMouseOutPlayButton;
+                            this.onClickButton = this.onPlayCard;
+                        } else {
+                            this.buttonCardConfig.x = -1000;
+                            this.buttonCardConfig.y = -1000;
+
+                            this.onMouseInButton = () => {};
+                            this.onMouseOutButton = () => {};
+                            this.onClickButton = () => {};
+                        }
+                        break;
+                    case 'prepare':
+                        this.buttonCardConfig = this.prepareButtonCardConfig;
+                        this.buttonTextConfig = this.prepareButtonTextConfig;
+                        this.onMouseInButton = this.onMouseInPrepareButton;
+                        this.onMouseOutButton = this.onMouseOutPrepareButton;
+                        this.onClickButton = this.onPrepareCard;
+                        break;
+                    case 'kou':
+                        this.buttonCardConfig = this.kouButtonCardConfig;
+                        this.buttonTextConfig = this.kouButtonTextConfig;
+                        this.onMouseInButton = this.onMouseInKouButton;
+                        this.onMouseOutButton = this.onMouseOutKouButton;
+                        this.onClickButton = this.onKouCard;
+                }
             }
         }
     }

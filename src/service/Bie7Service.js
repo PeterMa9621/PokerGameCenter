@@ -1,15 +1,19 @@
 import axios from "axios";
+import ApiUrl from "../common/ApiUrl";
 
 export default class Bie7Service {
-    static socketUrl = 'ws://192.168.0.38:3000/bie7/';
-    static apiUrl = 'http://192.168.0.38:3000/bie7/';
+    static socketUrl = ApiUrl.BIE_7_SOCKET_URL;
+    static apiUrl = ApiUrl.BIE_7_URL;
     webSocket = null;
     finishInit = false;
-    joinCallback = () => {};
+    updatePlayerCallback = () => {};
     closeCallback = () => {};
     startCallback = () => {};
     playCardCallback = () => {};
     clearBoardCallback = () => {};
+    errorCallback = () => {};
+    updatePokerCallback = () => {};
+    kouPokerCallback = () => {};
 
     constructor(roomId, userName, connectedCallBack) {
         this.connectedCallBack = connectedCallBack;
@@ -33,17 +37,26 @@ export default class Bie7Service {
                 return;
             let action = data['action'];
             switch (action) {
-                case 'join':
-                    this.joinCallback(data['orderedPlayers'], data['players']);
+                case 'update player':
+                    this.updatePlayerCallback(data['players']);
                     break;
                 case 'start':
-                    this.startCallback(data['pokers']);
+                    this.startCallback(data['currentPlayer']);
                     break;
                 case 'play card':
                     this.playCardCallback(data['poker'], data['userName']);
                     break;
                 case 'clear':
                     this.clearBoardCallback();
+                    break;
+                case 'error':
+                    this.errorCallback(data['msg'], data['userName']);
+                    break;
+                case 'update poker':
+                    this.updatePokerCallback(data['poker']);
+                    break;
+                case 'kou card':
+                    this.kouPokerCallback(data['userName']);
                     break;
             }
         };
@@ -66,9 +79,9 @@ export default class Bie7Service {
         this.sendMessage(JSON.stringify(data));
     }
 
-    playPoker(poker) {
+    playPoker(poker, isKou=false) {
         let data = {
-            action: 'play card',
+            action: !isKou?'play card':'kou card',
             userName: this.userName,
             roomId: this.roomId,
             poker: {

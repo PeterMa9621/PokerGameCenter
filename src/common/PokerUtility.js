@@ -30,4 +30,8 @@ export default class PokerUtility {
         let image = PokerContainer.images[poker.pokerType][poker.number-1];
         return new Poker(image, poker.pokerType, poker.number);
     }
+
+    static isSamePoker(targetPoker, otherPoker) {
+        return targetPoker.pokerType === otherPoker.pokerType && targetPoker.number === otherPoker.number;
+    }
 }

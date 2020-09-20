@@ -82,6 +82,9 @@
             },
             x: function (newX) {
                 this.calculateUserInfoPosition(newX);
+            },
+            opponent: function (newOpponent) {
+                this.gameConfig.text = '扣牌数: ' + newOpponent.numKou;
             }
         },
         methods: {

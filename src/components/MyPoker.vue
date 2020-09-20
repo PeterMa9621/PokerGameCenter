@@ -1,5 +1,5 @@
 <template>
-    <div v-if="myPokers.length > 0">
+    <div v-if="Object.keys(myPokers).length > 0">
         <div v-for="(poker, index) in myPokers" :key="poker.id">
             <PokerCard :poker="poker" :x="startPosition.x + index*interval" :y="startPosition.y"
                        :index="index" :selected-poker="selectedPoker" :can-operate="true" />

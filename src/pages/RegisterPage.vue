@@ -7,7 +7,7 @@
                     <div class="card login-card">
                         <div class="card-img-top mt-2 mb-2">
                             <div class="text-center">
-                                <img src="../assets/login.png" alt="">
+                                <img src="../assets/register.png" alt="">
                             </div>
                         </div>
                         <div class="card-body">
@@ -20,10 +20,10 @@
                                 <input type="password" id="password" name="username" class="form-control" v-model="password">
                             </div>
                             <div class="d-flex justify-content-between">
-                                <button class="btn btn-primary" @click="login()">Log in</button>
+                                <button class="btn btn-primary" @click="signUp()">Sign up</button>
                                 <div class="form-inline">
-                                    Need an account?
-                                    <router-link class="btn btn-link" :to="{name: 'register'}">Register</router-link>
+                                    Had an account already?
+                                    <router-link class="btn btn-link" :to="{name: 'login'}">Login</router-link>
                                 </div>
                             </div>
                         </div>
@@ -36,11 +36,10 @@
 </template>
 
 <script>
-    import User from "../models/User";
     import AccountService from "../service/AccountService";
 
     export default {
-        name: "LoginPage",
+        name: "RegisterPage",
         data() {
             return {
                 username: '',
@@ -48,21 +47,14 @@
             }
         },
         methods: {
-            login() {
-                AccountService.login(this.username, this.password).then(response => {
-                    if(!response['succeed'])
-                        return;
-                    let user = response['user'];
-                    this.$store.dispatch('setUser', new User({
-                        username: user.userName,
-                        ...user,
-                        isAuthorized: true
-                    }));
-                    this.$router.push(this.$route.query.next ? this.$route.query.next : '/');
+            signUp() {
+                AccountService.register(this.username, this.password).then(response => {
+                    if(response['succeed'])
+                        this.$router.push({name: 'login'});
                 }).catch(reason => {
-                    alert("帐号或密码错误");
                     console.log(reason);
                 });
+
             }
         }
     }

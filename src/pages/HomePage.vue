@@ -2,7 +2,15 @@
     <div class="container">
         <div class="card mt-5">
             <div class="card-header">
-                选择游戏
+                <div class="row justify-content-between">
+                    <div class="ml-3">
+                        选择游戏
+                    </div>
+                    <div class="mr-3">
+                        <button class="btn btn-primary" @click="logout">登出帐号</button>
+                    </div>
+                </div>
+
             </div>
             <div class="card-body">
                 <button class="btn btn-lg btn-primary" @click="() => play('bie7')">憋七</button>
@@ -22,6 +30,10 @@ export default {
     methods: {
         play(gameType) {
             this.$router.push({name: gameType});
+        },
+        logout() {
+            window.$cookies.set('username', '');
+            this.$router.push({name: 'login'});
         }
     }
 }
